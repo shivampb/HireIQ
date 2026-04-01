@@ -10,6 +10,7 @@ export interface ICandidate extends Document {
   experienceLevel: string;
   status: 'pending' | 'in_progress' | 'completed' | 'evaluated';
   currentQuestionIndex: number;
+  resumeFileId?: mongoose.Types.ObjectId;
   startedAt?: Date;
   completedAt?: Date;
   createdAt: Date;
@@ -30,6 +31,7 @@ const CandidateSchema = new Schema<ICandidate>(
       default: 'pending',
     },
     currentQuestionIndex: { type: Number, default: 0 },
+    resumeFileId: { type: Schema.Types.ObjectId, default: null },
     startedAt: { type: Date },
     completedAt: { type: Date },
   },

@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-type Step = 'loading' | 'welcome' | 'upload' | 'analyzing' | 'questions' | 'submitting' | 'completed' | 'error';
+type Step = 'loading' | 'welcome' | 'upload' | 'analyzing' | 'warning' | 'countdown' | 'questions' | 'submitting' | 'completed' | 'error';
 
 interface AssessmentInfo {
   _id: string;
@@ -27,12 +27,15 @@ interface QuestionData {
 
 export default function AssessmentPage() {
   const params = useParams();
+  const router = useRouter();
   const link = params.link as string;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState<Step>('loading');
   const [assessment, setAssessment] = useState<AssessmentInfo | null>(null);
   const [error, setError] = useState('');
+  const [warningAgreed, setWarningAgreed] = useState(false);
+  const [countdown, setCountdown] = useState(10);
 
   // Candidate form
   const [name, setName] = useState('');
@@ -47,6 +50,18 @@ export default function AssessmentPage() {
   const [answer, setAnswer] = useState('');
   const [submittingAnswer, setSubmittingAnswer] = useState(false);
   const [detectedSkills, setDetectedSkills] = useState<string[]>([]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (step === 'countdown' && countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (step === 'countdown' && countdown === 0) {
+      setStep('questions');
+    }
+  }, [step, countdown]);
 
   // Load assessment details
   useEffect(() => {
@@ -101,7 +116,8 @@ export default function AssessmentPage() {
       setCurrentQuestion(data.firstQuestion);
       setCurrentIndex(0);
       setDetectedSkills(data.resumeAnalysis?.skills || []);
-      setStep('questions');
+      setWarningAgreed(false); // Reset warning agreement for new assessment
+      setStep('warning'); // Go to warning first before questions
     } catch (err) {
       setError('Something went wrong. Please try again.');
       setStep('upload');
@@ -135,12 +151,19 @@ export default function AssessmentPage() {
 
       if (data.completed) {
         setStep('submitting');
-        // Auto-generate report in background without blocking candidate UI
-        fetch(`/api/assess/${link}/report`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ candidateId }),
-        }).catch(err => console.error('Background report auto-generation failed:', err));
+        // Auto-generate report - wait for it to complete
+        try {
+          const reportRes = await fetch(`/api/assess/${link}/report`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ candidateId }),
+          });
+          if (!reportRes.ok) {
+            console.error('Report generation failed:', await reportRes.json());
+          }
+        } catch (err) {
+          console.error('Report generation error:', err);
+        }
         
         setStep('completed');
       } else {
@@ -248,13 +271,18 @@ export default function AssessmentPage() {
             <span className="step-label">Welcome</span>
           </div>
           <div className={`step-line ${step !== 'welcome' ? 'completed' : ''}`}></div>
-          <div className={`step ${(step === 'upload' || step === 'analyzing') ? 'active' : (step === 'questions' || step === 'submitting') ? 'completed' : ''}`}>
-            <div className="step-number">{(step === 'questions' || step === 'submitting') ? '✓' : '2'}</div>
+          <div className={`step ${(step === 'upload' || step === 'analyzing') ? 'active' : (step === 'warning' || step === 'questions' || step === 'submitting') ? 'completed' : ''}`}>
+            <div className="step-number">{(step === 'warning' || step === 'questions' || step === 'submitting') ? '✓' : '2'}</div>
             <span className="step-label">Upload Resume</span>
+          </div>
+          <div className={`step-line ${(step === 'warning' || step === 'questions' || step === 'submitting') ? 'completed' : ''}`}></div>
+          <div className={`step ${(step === 'warning') ? 'active' : (step === 'questions' || step === 'submitting') ? 'completed' : ''}`}>
+            <div className="step-number">{(step === 'questions' || step === 'submitting') ? '✓' : '3'}</div>
+            <span className="step-label">Integrity Policy</span>
           </div>
           <div className={`step-line ${(step === 'questions' || step === 'submitting') ? 'completed' : ''}`}></div>
           <div className={`step ${step === 'questions' ? 'active' : step === 'submitting' ? 'completed' : ''}`}>
-            <div className="step-number">3</div>
+            <div className="step-number">{step === 'submitting' ? '✓' : '4'}</div>
             <span className="step-label">Assessment</span>
           </div>
         </div>
@@ -470,6 +498,132 @@ export default function AssessmentPage() {
               <div className="badge badge-green" style={{ animation: 'pulse 1.5s infinite 0.6s' }}>
                 📝 Generating questions...
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Warning Step */}
+        {step === 'warning' && (
+          <div className="question-card" style={{ maxWidth: '700px' }}>
+            <div style={{ textAlign: 'center', marginBottom: 'var(--space-6)' }}>
+              <div style={{ fontSize: '3rem', marginBottom: 'var(--space-3)' }}>⚠️</div>
+              <h2 style={{
+                fontSize: 'var(--font-size-xl)',
+                fontWeight: 700,
+                color: 'var(--gray-900)',
+                marginBottom: 'var(--space-2)',
+              }}>
+                Assessment Integrity Policy
+              </h2>
+            </div>
+
+            <div style={{ marginBottom: 'var(--space-6)', lineHeight: 1.7, color: 'var(--gray-700)', fontSize: '14px' }}>
+              <p style={{ marginBottom: 'var(--space-4)' }}>
+                <strong>This is an integrity-monitored assessment.</strong> All answers are analyzed for authenticity using AI-powered detection systems that identify cheating through:
+              </p>
+              <ul style={{ marginLeft: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
+                <li style={{ marginBottom: '8px' }}>Consistency checks between answers and resume</li>
+                <li style={{ marginBottom: '8px' }}>Generic/AI-generated response detection</li>
+                <li style={{ marginBottom: '8px' }}>Plagiarism and resource copying detection</li>
+              </ul>
+              <p style={{ marginBottom: 'var(--space-4)', color: 'var(--red-700)', backgroundColor: 'var(--red-50)', padding: 'var(--space-3)', borderRadius: 'var(--radius-md)' }}>
+                <strong>⛔ Cheating will result in:</strong> Immediate disqualification, permanent ban from all assessments, and potential legal action.
+              </p>
+              <p style={{ marginBottom: 'var(--space-4)', color: 'var(--red-600)', fontWeight: 500 }}>
+                📋 We already have your resume and all your details on file. We will take strict action against any detected cheating.
+              </p>
+              <p style={{ fontSize: '13px', color: 'var(--gray-600)' }}>
+                ✅ You MAY use your own knowledge and take reasonable time to answer. Use your honest abilities.
+              </p>
+            </div>
+
+            <div style={{
+              padding: 'var(--space-4)',
+              backgroundColor: 'var(--gray-50)',
+              borderRadius: 'var(--radius-md)',
+              marginBottom: 'var(--space-6)',
+              border: '1px solid var(--gray-200)'
+            }}>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-3)', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={warningAgreed}
+                  onChange={(e) => setWarningAgreed(e.target.checked)}
+                  style={{
+                    marginTop: '4px',
+                    width: '18px',
+                    height: '18px',
+                    cursor: 'pointer',
+                    flexShrink: 0
+                  }}
+                />
+                <span className="text-sm" style={{ color: 'var(--gray-700)', lineHeight: 1.5 }}>
+                  I understand and accept the integrity policy. I commit to taking this assessment honestly and understand the consequences of cheating.
+                </span>
+              </label>
+            </div>
+
+            <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => window.location.href = '/'}
+              >
+                ← Decline & Exit
+              </button>
+              <button
+                className="btn btn-primary btn-lg"
+                onClick={() => { setCountdown(10); setStep('countdown'); }}
+                disabled={!warningAgreed}
+                style={{ opacity: warningAgreed ? 1 : 0.5, cursor: warningAgreed ? 'pointer' : 'not-allowed', flex: 1 }}
+              >
+                I Agree & Start Assessment →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Countdown Step */}
+        {step === 'countdown' && (
+          <div className="question-card" style={{ textAlign: 'center', maxWidth: '500px', margin: '0 auto' }}>
+            <div style={{ marginBottom: 'var(--space-8)' }}>
+              <h2 style={{
+                fontSize: 'var(--font-size-xl)',
+                fontWeight: 700,
+                color: 'var(--gray-900)',
+                marginBottom: 'var(--space-6)',
+              }}>
+                Your Exam Starts In
+              </h2>
+              <div style={{
+                fontSize: '6rem',
+                fontWeight: 800,
+                color: 'var(--primary-600)',
+                lineHeight: 1,
+                marginBottom: 'var(--space-4)',
+                animation: 'pulse 1s infinite'
+              }}>
+                {countdown}
+              </div>
+              <p style={{
+                fontSize: 'var(--font-size-base)',
+                color: 'var(--gray-600)',
+                marginTop: 'var(--space-4)'
+              }}>
+                ✅ Assessment is loading. Get ready!
+              </p>
+            </div>
+            <div style={{
+              background: 'var(--primary-50)',
+              border: '1px solid var(--primary-100)',
+              borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-4)',
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--primary-700)',
+              lineHeight: 1.6
+            }}>
+              <p>📝 Remember: You have {totalQuestions} questions to answer</p>
+              <p>⏱️ Take your time but be accurate</p>
+              <p>✨ Your honest answers matter most</p>
             </div>
           </div>
         )}

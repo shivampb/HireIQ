@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import dbConnect from '@/lib/mongodb';
 import Assessment from '@/models/Assessment';
 import Candidate from '@/models/Candidate';
 import Question from '@/models/Question';
 import { parseResume, generateQuestions } from '@/lib/gemini';
+import { GridFSBucket } from 'mongodb';
 
 export async function POST(
   req: NextRequest,
@@ -87,6 +89,38 @@ export async function POST(
       status: 'in_progress',
       startedAt: new Date(),
     });
+
+    // Store resume file in GridFS
+    try {
+      await dbConnect();
+      const db = mongoose.connection.db!;
+      const bucket = new GridFSBucket(db, { bucketName: 'resumes' });
+      
+      const uploadStream = bucket.openUploadStream(`${candidate._id}-${resumeFile.name}`, {
+        metadata: {
+          candidateId: candidate._id.toString(),
+          assessmentId: assessment._id.toString(),
+          originalName: resumeFile.name,
+          uploadedAt: new Date(),
+        },
+      });
+
+      uploadStream.end(fileBuffer);
+
+      const fileId = await new Promise((resolve, reject) => {
+        uploadStream.on('finish', () => resolve(uploadStream.id));
+        uploadStream.on('error', reject);
+      });
+
+      // Update candidate with file ID
+      await Candidate.updateOne(
+        { _id: candidate._id },
+        { resumeFileId: fileId }
+      );
+    } catch (gridfsError) {
+      console.error('GridFS storage error:', gridfsError);
+      // Continue without storing file - not critical
+    }
 
     // AI: Generate questions
     const generatedQuestions = await generateQuestions(
