@@ -1,4 +1,4 @@
-declare module 'pdf-parse' {
+declare module "pdf-parse" {
   interface PDFData {
     numpages: number;
     numrender: number;
@@ -8,7 +8,10 @@ declare module 'pdf-parse' {
     version: string;
   }
 
-  function pdfParse(dataBuffer: Buffer | ArrayBuffer | Uint8Array, options?: Record<string, unknown>): Promise<PDFData>;
+  function pdfParse(
+    dataBuffer: Buffer | ArrayBuffer | Uint8Array,
+    options?: Record<string, unknown>,
+  ): Promise<PDFData>;
 
   export default pdfParse;
 }
