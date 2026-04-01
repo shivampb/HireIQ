@@ -152,7 +152,16 @@ export default function CandidateDetailPage() {
           </div>
 
           {/* Force Regenerate Button & View Resume */}
-          <div style={{ marginBottom: "var(--space-6)", display: "flex", gap: "var(--space-3)", justifyContent: "flex-end", alignItems: "center", flexWrap: "wrap" }}>
+          <div
+            style={{
+              marginBottom: "var(--space-6)",
+              display: "flex",
+              gap: "var(--space-3)",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
             <a
               href={`/api/candidates/${params.id}/resume`}
               download

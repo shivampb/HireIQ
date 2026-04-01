@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface ICandidate extends Document {
   companyId: mongoose.Types.ObjectId;
@@ -8,7 +8,7 @@ export interface ICandidate extends Document {
   resumeText: string;
   resumeSkills: string[];
   experienceLevel: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'evaluated';
+  status: "pending" | "in_progress" | "completed" | "evaluated";
   currentQuestionIndex: number;
   resumeFileId?: mongoose.Types.ObjectId;
   startedAt?: Date;
@@ -18,29 +18,40 @@ export interface ICandidate extends Document {
 
 const CandidateSchema = new Schema<ICandidate>(
   {
-    companyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true },
-    assessmentId: { type: Schema.Types.ObjectId, ref: 'Assessment', required: true, index: true },
+    companyId: {
+      type: Schema.Types.ObjectId,
+      ref: "Company",
+      required: true,
+      index: true,
+    },
+    assessmentId: {
+      type: Schema.Types.ObjectId,
+      ref: "Assessment",
+      required: true,
+      index: true,
+    },
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, lowercase: true, trim: true },
-    resumeText: { type: String, default: '' },
+    resumeText: { type: String, default: "" },
     resumeSkills: [{ type: String }],
-    experienceLevel: { type: String, default: 'unknown' },
+    experienceLevel: { type: String, default: "unknown" },
     status: {
       type: String,
-      enum: ['pending', 'in_progress', 'completed', 'evaluated'],
-      default: 'pending',
+      enum: ["pending", "in_progress", "completed", "evaluated"],
+      default: "pending",
     },
     currentQuestionIndex: { type: Number, default: 0 },
     resumeFileId: { type: Schema.Types.ObjectId, default: null },
     startedAt: { type: Date },
     completedAt: { type: Date },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 CandidateSchema.index({ companyId: 1, assessmentId: 1 });
 CandidateSchema.index({ assessmentId: 1, email: 1 }, { unique: true });
 
 const Candidate: Model<ICandidate> =
-  mongoose.models.Candidate || mongoose.model<ICandidate>('Candidate', CandidateSchema);
+  mongoose.models.Candidate ||
+  mongoose.model<ICandidate>("Candidate", CandidateSchema);
 export default Candidate;

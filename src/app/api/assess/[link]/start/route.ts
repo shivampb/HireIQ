@@ -1,40 +1,40 @@
-import { NextRequest, NextResponse } from 'next/server';
-import mongoose from 'mongoose';
-import dbConnect from '@/lib/mongodb';
-import Assessment from '@/models/Assessment';
-import Candidate from '@/models/Candidate';
-import Question from '@/models/Question';
-import { parseResume, generateQuestions } from '@/lib/gemini';
-import { GridFSBucket } from 'mongodb';
+import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
+import dbConnect from "@/lib/mongodb";
+import Assessment from "@/models/Assessment";
+import Candidate from "@/models/Candidate";
+import Question from "@/models/Question";
+import { parseResume, generateQuestions } from "@/lib/gemini";
+import { GridFSBucket } from "mongodb";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { link: string } }
+  { params }: { params: { link: string } },
 ) {
   try {
     await dbConnect();
 
     const assessment = await Assessment.findOne({
       uniqueLink: params.link,
-      status: 'active',
+      status: "active",
     });
 
     if (!assessment) {
       return NextResponse.json(
-        { error: 'Assessment not found or no longer active' },
-        { status: 404 }
+        { error: "Assessment not found or no longer active" },
+        { status: 404 },
       );
     }
 
     const formData = await req.formData();
-    const name = formData.get('name') as string;
-    const email = formData.get('email') as string;
-    const resumeFile = formData.get('resume') as File;
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const resumeFile = formData.get("resume") as File;
 
     if (!name || !email || !resumeFile) {
       return NextResponse.json(
-        { error: 'Name, email, and resume are required' },
-        { status: 400 }
+        { error: "Name, email, and resume are required" },
+        { status: 400 },
       );
     }
 
@@ -46,31 +46,40 @@ export async function POST(
 
     if (existingCandidate) {
       return NextResponse.json(
-        { error: 'You have already started this assessment', candidateId: existingCandidate._id },
-        { status: 409 }
+        {
+          error: "You have already started this assessment",
+          candidateId: existingCandidate._id,
+        },
+        { status: 409 },
       );
     }
 
     // Parse the resume file
-    let resumeText = '';
+    let resumeText = "";
     const fileBuffer = Buffer.from(await resumeFile.arrayBuffer());
-    
-    if (resumeFile.name.endsWith('.pdf')) {
-      const pdfParse = (await import('pdf-parse')).default;
+
+    if (resumeFile.name.endsWith(".pdf")) {
+      const pdfParse = (await import("pdf-parse")).default;
       const pdfData = await pdfParse(fileBuffer);
       resumeText = pdfData.text;
-    } else if (resumeFile.name.endsWith('.docx') || resumeFile.name.endsWith('.doc')) {
-      const mammoth = await import('mammoth');
+    } else if (
+      resumeFile.name.endsWith(".docx") ||
+      resumeFile.name.endsWith(".doc")
+    ) {
+      const mammoth = await import("mammoth");
       const result = await mammoth.extractRawText({ buffer: fileBuffer });
       resumeText = result.value;
     } else {
-      resumeText = fileBuffer.toString('utf-8');
+      resumeText = fileBuffer.toString("utf-8");
     }
 
     if (!resumeText.trim()) {
       return NextResponse.json(
-        { error: 'Could not extract text from the resume. Please upload a valid PDF or DOC file.' },
-        { status: 400 }
+        {
+          error:
+            "Could not extract text from the resume. Please upload a valid PDF or DOC file.",
+        },
+        { status: 400 },
       );
     }
 
@@ -86,7 +95,7 @@ export async function POST(
       resumeText,
       resumeSkills: resumeAnalysis.skills,
       experienceLevel: resumeAnalysis.experienceLevel,
-      status: 'in_progress',
+      status: "in_progress",
       startedAt: new Date(),
     });
 
@@ -94,31 +103,34 @@ export async function POST(
     try {
       await dbConnect();
       const db = mongoose.connection.db!;
-      const bucket = new GridFSBucket(db, { bucketName: 'resumes' });
-      
-      const uploadStream = bucket.openUploadStream(`${candidate._id}-${resumeFile.name}`, {
-        metadata: {
-          candidateId: candidate._id.toString(),
-          assessmentId: assessment._id.toString(),
-          originalName: resumeFile.name,
-          uploadedAt: new Date(),
+      const bucket = new GridFSBucket(db, { bucketName: "resumes" });
+
+      const uploadStream = bucket.openUploadStream(
+        `${candidate._id}-${resumeFile.name}`,
+        {
+          metadata: {
+            candidateId: candidate._id.toString(),
+            assessmentId: assessment._id.toString(),
+            originalName: resumeFile.name,
+            uploadedAt: new Date(),
+          },
         },
-      });
+      );
 
       uploadStream.end(fileBuffer);
 
       const fileId = await new Promise((resolve, reject) => {
-        uploadStream.on('finish', () => resolve(uploadStream.id));
-        uploadStream.on('error', reject);
+        uploadStream.on("finish", () => resolve(uploadStream.id));
+        uploadStream.on("error", reject);
       });
 
       // Update candidate with file ID
       await Candidate.updateOne(
         { _id: candidate._id },
-        { resumeFileId: fileId }
+        { resumeFileId: fileId },
       );
     } catch (gridfsError) {
-      console.error('GridFS storage error:', gridfsError);
+      console.error("GridFS storage error:", gridfsError);
       // Continue without storing file - not critical
     }
 
@@ -130,7 +142,7 @@ export async function POST(
       assessment.questionCount,
       assessment.difficulty,
       assessment.skills,
-      assessment.aiPrompt
+      assessment.aiPrompt,
     );
 
     // Store questions in database
@@ -143,13 +155,13 @@ export async function POST(
         difficulty: q.difficulty,
         expectedConcepts: q.expectedConcepts,
         order: index,
-      }))
+      })),
     );
 
     // Increment candidate count
     await Assessment.updateOne(
       { _id: assessment._id },
-      { $inc: { candidateCount: 1 } }
+      { $inc: { candidateCount: 1 } },
     );
 
     return NextResponse.json(
@@ -167,13 +179,13 @@ export async function POST(
           experienceLevel: resumeAnalysis.experienceLevel,
         },
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: any) {
-    console.error('Start assessment error:', error);
+    console.error("Start assessment error:", error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
+      { error: error.message || "Internal server error" },
+      { status: 500 },
     );
   }
 }
