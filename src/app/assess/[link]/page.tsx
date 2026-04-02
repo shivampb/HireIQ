@@ -4,6 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/github-dark.css";
 
 type Step =
   | "loading"
@@ -378,7 +380,10 @@ export default function AssessmentPage() {
                     gap: "var(--space-3)",
                   }}
                 >
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight]}
+                  >
                     {assessment.description}
                   </ReactMarkdown>
                 </div>
@@ -984,7 +989,10 @@ export default function AssessmentPage() {
                   gap: "1rem",
                 }}
               >
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeHighlight]}
+                >
                   {currentQuestion.question}
                 </ReactMarkdown>
               </div>

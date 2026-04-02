@@ -2,6 +2,10 @@
 
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /* ─── Animated Counter Hook ─── */
 function useCountUp(target: number, duration = 2000, startOnView = true) {
@@ -107,11 +111,109 @@ export default function HomePage() {
 
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // ── GSAP Animations ──
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Hero entrance timeline
+      const tl = gsap.timeline({ delay: 0.15 });
+      tl.fromTo('.hero-badge-wrapper',
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }
+      )
+      .fromTo('.hero-title-oneline',
+        { opacity: 0, y: 36 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.4'
+      )
+      .fromTo('.hero-typewriter-line',
+        { opacity: 0, y: 28 },
+        { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.5'
+      )
+      .fromTo('.hero-title-sub-line',
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, '-=0.45'
+      )
+      .fromTo('.hero-subtitle',
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, '-=0.4'
+      )
+      .fromTo('.hero-cta-row',
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.55, ease: 'back.out(1.8)' }, '-=0.35'
+      )
+      .fromTo('.hero-trust-row',
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, '-=0.3'
+      );
+
+      // Orbs organic float
+      gsap.utils.toArray<HTMLElement>('.hero-orb').forEach((orb, i) => {
+        gsap.to(orb, {
+          x: gsap.utils.random(-50, 50),
+          y: gsap.utils.random(-40, 40),
+          scale: gsap.utils.random(0.95, 1.06),
+          duration: gsap.utils.random(5, 9),
+          repeat: -1, yoyo: true,
+          ease: 'sine.inOut',
+          delay: i * 0.8,
+        });
+      });
+
+      // Mockup entrance + float
+      gsap.fromTo('.hero-mockup-wrapper',
+        { opacity: 0, y: 80, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 1.1, ease: 'power4.out', delay: 0.6 }
+      );
+      gsap.to('.hero-mockup-wrapper', {
+        y: 14, duration: 3.2, repeat: -1, yoyo: true,
+        ease: 'sine.inOut', delay: 1.7
+      });
+
+      // Mockup internals stagger
+      gsap.fromTo('.mockup-stat-card',
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, stagger: 0.1, duration: 0.55, ease: 'back.out(1.5)', delay: 1.1 }
+      );
+      gsap.fromTo('.mockup-table-row',
+        { opacity: 0, x: -18 },
+        { opacity: 1, x: 0, stagger: 0.1, duration: 0.5, ease: 'power3.out', delay: 1.5 }
+      );
+
+      // ── ScrollTrigger: section reveals ──
+      const revealBatch = (selector: string, stagger = 0.12) => {
+        gsap.fromTo(selector,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1, y: 0, stagger,
+            duration: 0.75, ease: 'power3.out',
+            scrollTrigger: { trigger: selector, start: 'top 85%', toggleActions: 'play none none none' },
+          }
+        );
+      };
+
+      revealBatch('.logo-item', 0.07);
+      revealBatch('.stats-bar-item', 0.1);
+      revealBatch('.feature-bento-card', 0.1);
+      revealBatch('.how-step', 0.15);
+      revealBatch('.testimonial-card', 0.12);
+      revealBatch('.pricing-card', 0.12);
+      revealBatch('.faq-item', 0.08);
+      revealBatch('.section-eyebrow', 0);
+      revealBatch('.section-heading', 0);
+      revealBatch('.section-desc', 0);
+      revealBatch('.final-cta-section', 0);
+      revealBatch('.footer-col', 0.1);
+      revealBatch('.footer-brand-col', 0);
+    }, pageRef);
+
+    return () => ctx.revert();
   }, []);
 
   const FAQS = [
@@ -138,7 +240,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="landing-page">
+    <div className="landing-page" ref={pageRef}>
       {/* ═══════════ NAVBAR ═══════════ */}
       <nav className={`landing-nav ${scrolled ? 'landing-nav-scrolled' : ''}`}>
         <div className="landing-nav-inner">
@@ -155,7 +257,7 @@ export default function HomePage() {
 
           <div className="landing-nav-links">
             <a href="#features">Features</a>
-            <a href="#how-it-works">How It Works</a>
+            <Link href="/how-it-works">How It Works</Link>
             <a href="#pricing">Pricing</a>
             <a href="#faq">FAQ</a>
           </div>
@@ -178,66 +280,55 @@ export default function HomePage() {
         <div className="hero-grid-bg"></div>
 
         <div className="container hero-content">
-          <Reveal>
-            <div className="hero-badge-wrapper">
-              <span className="hero-badge-new">
-                <span className="hero-badge-dot"></span>
-                New
-              </span>
-              <span className="hero-badge-text">AI-Powered Technical Assessments</span>
-              <span className="hero-badge-arrow">→</span>
-            </div>
-          </Reveal>
+          <div className="hero-badge-wrapper">
+            <span className="hero-badge-new">
+              <span className="hero-badge-dot"></span>
+              New
+            </span>
+            <span className="hero-badge-text">AI-Powered Technical Assessments</span>
+            <span className="hero-badge-arrow">→</span>
+          </div>
 
-          <Reveal delay={100}>
-            <h1 className="hero-title hero-title-oneline">
-              Hire smarter with
-            </h1>
-            <div className="hero-typewriter-line">
-              <TypeWriter words={['AI Precision', 'Fraud Detection', 'Smart Questions', 'Deep Insights']} />
-            </div>
-            <p className="hero-title-sub-line">Identify genuine developer talent at scale</p>
-          </Reveal>
+          <h1 className="hero-title hero-title-oneline">
+            Hire smarter with
+          </h1>
+          <div className="hero-typewriter-line">
+            <TypeWriter words={['AI Precision', 'Fraud Detection', 'Smart Questions', 'Deep Insights']} />
+          </div>
+          <p className="hero-title-sub-line">Identify genuine developer talent at scale</p>
 
-          <Reveal delay={200}>
-            <p className="hero-subtitle">
-              Upload a resume. Get AI-generated questions tailored to the candidate&apos;s skills.
-              Receive a comprehensive evaluation with fraud detection — in minutes, not hours.
-            </p>
-          </Reveal>
+          <p className="hero-subtitle">
+            Upload a resume. Get AI-generated questions tailored to the candidate&apos;s skills.
+            Receive a comprehensive evaluation with fraud detection — in minutes, not hours.
+          </p>
 
-          <Reveal delay={300}>
-            <div className="hero-cta-row">
-              <Link href="/register" className="btn btn-primary btn-hero">
-                Start Assessing for Free
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </Link>
-              <Link href="#how-it-works" className="btn btn-hero-secondary">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5"/><path d="M8 7l5 3-5 3V7z" fill="currentColor"/></svg>
-                See How It Works
-              </Link>
-            </div>
-          </Reveal>
+          <div className="hero-cta-row">
+            <Link href="/register" className="btn btn-primary btn-hero">
+              Start Assessing for Free
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </Link>
+            <Link href="/how-it-works" className="btn btn-hero-secondary">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5"/><path d="M8 7l5 3-5 3V7z" fill="currentColor"/></svg>
+              See How It Works
+            </Link>
+          </div>
 
-          <Reveal delay={350}>
-            <div className="hero-trust-row">
-              <div className="hero-trust-avatars">
-                {['#6366f1','#3b82f6','#10b981','#f59e0b','#ef4444'].map((c, i) => (
-                  <div key={i} className="hero-trust-avatar" style={{ background: c, zIndex: 5 - i }}>
-                    {String.fromCharCode(65 + i)}
-                  </div>
-                ))}
-              </div>
-              <div className="hero-trust-text">
-                <div className="hero-trust-stars">★★★★★</div>
-                <span>Trusted by <strong>150+ companies</strong> worldwide</span>
-              </div>
+          <div className="hero-trust-row">
+            <div className="hero-trust-avatars">
+              {['#6366f1','#3b82f6','#10b981','#f59e0b','#ef4444'].map((c, i) => (
+                <div key={i} className="hero-trust-avatar" style={{ background: c, zIndex: 5 - i }}>
+                  {String.fromCharCode(65 + i)}
+                </div>
+              ))}
             </div>
-          </Reveal>
+            <div className="hero-trust-text">
+              <div className="hero-trust-stars">★★★★★</div>
+              <span>Trusted by <strong>150+ companies</strong> worldwide</span>
+            </div>
+          </div>
 
           {/* Dashboard Preview Mockup */}
-          <Reveal delay={450}>
-            <div className="hero-mockup-wrapper">
+          <div className="hero-mockup-wrapper">
               <div className="hero-mockup-glow"></div>
               <div className="hero-mockup">
                 {/* Mock Dashboard Header */}
@@ -303,7 +394,6 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-          </Reveal>
         </div>
       </section>
 
@@ -691,12 +781,12 @@ export default function HomePage() {
               <h4>Product</h4>
               <a href="#features">Features</a>
               <a href="#pricing">Pricing</a>
-              <a href="#how-it-works">How It Works</a>
+              <Link href="/how-it-works">How It Works</Link>
               <a href="#faq">FAQ</a>
             </div>
             <div className="footer-col">
               <h4>Company</h4>
-              <a href="#">About</a>
+              <Link href="/about">About</Link>
               <a href="#">Blog</a>
               <a href="#">Careers</a>
               <a href="#">Contact</a>

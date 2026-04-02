@@ -120,7 +120,7 @@ export async function generateQuestions(
 > {
   const skillFocus = targetSkills.length > 0 ? targetSkills : skills;
 
-  const prompt = `You are a technical interviewer generating ${questionCount} concise interview questions.
+  const prompt = `You are an elite technical interviewer generating exactly ${questionCount} concise, well-structured interview questions.
 
 Candidate Profile:
 - Skills: ${skills.join(", ")}
@@ -131,24 +131,50 @@ ${aiPrompt && aiPrompt.trim() !== "" ? `\nSPECIAL ADMIN INSTRUCTIONS:\n${aiPromp
 STRICT REQUIREMENTS FOR QUESTIONS:
 1. MUST BE BITE-SIZED AND FEASIBLE for a quick web-based assessment.
 2. NO long-form architecture questions or full application build requests.
-3. Use formats like: 
-   - Short code logic (e.g., "What will this snippet output?", "Write a 3-line function to do X")
-   - Multiple Choice Questions (e.g., "Which is true? A) ... B) ... (Explain why)")
-   - Brief Q&A testing specific knowledge ("What is the difference between X and Y?")
-4. Mix of easy, medium, and hard based on the difficulty setting.
-5. Cover different skill areas from the resume.
+3. Mix of easy, medium, and hard based on the difficulty setting.
+4. Cover different skill areas from the resume.
+
+MANDATORY MARKDOWN FORMATTING RULES (the question field MUST use pure Markdown):
+
+**For code-based questions**, use this EXACT structure:
+- Start with a brief context line in **bold** (e.g. "**Consider the following JavaScript code:**")
+- Then a fenced code block with the language tag (e.g. \`\`\`javascript ... \`\`\`)
+- Then the actual question on a new line (e.g. "What will be the output of the above code? Explain why.")
+- Example:
+  **Analyze the following code:**
+  \`\`\`python
+  x = [1, 2, 3]
+  y = x
+  y.append(4)
+  print(x)
+  \`\`\`
+  What will \`print(x)\` output and why?
+
+**For MCQ questions**, use this EXACT structure:
+- State the question clearly in **bold**
+- List options using a lettered Markdown list:
+  - **A)** Option one
+  - **B)** Option two
+  - **C)** Option three
+  - **D)** Option four
+- End with: *Select the correct answer and explain your reasoning.*
+
+**For conceptual/Q&A questions**:
+- Use **bold** for key terms
+- Use \`backticks\` for any technical terms, function names, or keywords
+- Keep it to 1-3 sentences
 
 Return a JSON array with exactly this format:
 [
   {
-    "question": "The full question text. USE MARKDOWN FORMATTING (e.g. 'backticks' for code snippets, **bolding**, and lists for MCQ options)",
-    "category": "skill or topic category (e.g., 'React', 'JavaScript', 'Logic')",
+    "question": "The full question text using PURE MARKDOWN as described above",
+    "category": "skill or topic category (e.g., 'React', 'JavaScript', 'Python')",
     "difficulty": "easy|medium|hard",
     "expectedConcepts": ["concept1", "concept2"]
   }
 ]
 
-Return ONLY the JSON array, no markdown formatting, no code blocks, no additional text.`;
+Return ONLY the JSON array, no wrapping markdown formatting, no code blocks around the JSON, no additional text.`;
 
   const result = await model.generateContent(prompt);
   const response = result.response.text();
