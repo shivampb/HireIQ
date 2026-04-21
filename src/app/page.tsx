@@ -258,6 +258,7 @@ export default function HomePage() {
           <div className="landing-nav-links">
             <a href="#features">Features</a>
             <Link href="/how-it-works">How It Works</Link>
+            <Link href="/founder">Founder</Link>
             <a href="#pricing">Pricing</a>
             <a href="#faq">FAQ</a>
           </div>
