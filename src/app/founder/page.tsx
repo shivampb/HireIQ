@@ -98,10 +98,11 @@ export default function FounderPage() {
             <span style={{ fontWeight: 800, fontSize: 18, color: '#111827' }}>HireIQ</span>
           </Link>
           <div style={{ display: 'flex', gap: 4 }}>
-            {[['Features', '/#features'], ['How It Works', '/how-it-works'], ['About', '/about'], ['Pricing', '/#pricing']].map(([label, href]) => (
+            {[['Features', '/#features'], ['How It Works', '/how-it-works'], ['Founder', '/founder'], ['About', '/about'], ['Pricing', '/#pricing']].map(([label, href]) => (
               <Link key={label} href={href} style={{
-                padding: '8px 14px', borderRadius: 8, fontSize: 14, fontWeight: 500,
-                color: '#6b7280', textDecoration: 'none',
+                padding: '8px 14px', borderRadius: 8, fontSize: 14, fontWeight: label === 'Founder' ? 700 : 500,
+                color: label === 'Founder' ? '#4f46e5' : '#6b7280', textDecoration: 'none',
+                background: label === 'Founder' ? 'rgba(79,70,229,0.07)' : 'transparent',
               }}>{label}</Link>
             ))}
           </div>
@@ -220,7 +221,7 @@ export default function FounderPage() {
             </div>
             <div>
               <h4 style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 18 }}>Product</h4>
-              {[['Features', '/#features'], ['How It Works', '/how-it-works'], ['About', '/about'], ['Pricing', '/#pricing']].map(([label, href]) => (
+              {[['Features', '/#features'], ['How It Works', '/how-it-works'], ['Founder', '/founder'], ['About', '/about'], ['Pricing', '/#pricing']].map(([label, href]) => (
                 <Link key={label} href={href} className="hover-link" style={{ display: 'block', fontSize: 14, color: 'rgba(255,255,255,0.55)', marginBottom: 11, textDecoration: 'none' }}>{label}</Link>
               ))}
             </div>
