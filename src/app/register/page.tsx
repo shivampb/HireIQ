@@ -77,8 +77,31 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
+    <div className="auth-container" style={{ height: '100vh', width: '100vw', overflow: 'hidden', padding: 0 }}>
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        disableRemotePlayback
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          pointerEvents: 'none',
+          zIndex: 0
+        }}
+        poster="https://images.unsplash.com/photo-1557683316-973673baf926?w=1600&q=60"
+      >
+        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260424_064411_9e9d7f84-9277-41f4-ab10-59172d89e6be.mp4" type="video/mp4" />
+      </video>
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(255,255,255,0.15)', zIndex: 0 }}></div>
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', overflowY: 'auto' }}>
+        <div className="auth-card" style={{ margin: 'auto', zIndex: 1 }}>
         <div className="auth-header">
           <div className="auth-logo">
             <div className="auth-logo-icon">H</div>
@@ -95,32 +118,34 @@ export default function RegisterPage() {
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label" htmlFor="name">Company Name</label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              className="form-input"
-              placeholder="e.g., Acme Technologies"
-              value={form.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <div style={{ display: 'flex', gap: '1rem', marginBottom: 'var(--space-5)' }}>
+            <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
+              <label className="form-label" htmlFor="name">Company Name</label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                className="form-input"
+                placeholder="Acme Tech"
+                value={form.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="email">Work Email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              className="form-input"
-              placeholder="you@company.com"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
+            <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
+              <label className="form-label" htmlFor="email">Work Email</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                className="form-input"
+                placeholder="you@company.com"
+                value={form.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
 
           <div className="form-group">
@@ -140,32 +165,34 @@ export default function RegisterPage() {
             </select>
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="password">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              className="form-input"
-              placeholder="Min. 8 characters"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <div style={{ display: 'flex', gap: '1rem', marginBottom: 'var(--space-5)' }}>
+            <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
+              <label className="form-label" htmlFor="password">Password</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                className="form-input"
+                placeholder="Min. 8 chars"
+                value={form.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              className="form-input"
-              placeholder="Confirm your password"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              required
-            />
+            <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
+              <label className="form-label" htmlFor="confirmPassword">Confirm</label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                className="form-input"
+                placeholder="Confirm password"
+                value={form.confirmPassword}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
 
           <button
@@ -189,6 +216,7 @@ export default function RegisterPage() {
           <Link href="/login" style={{ fontWeight: 600 }}>
             Sign in
           </Link>
+        </div>
         </div>
       </div>
     </div>

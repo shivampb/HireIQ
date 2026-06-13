@@ -4,6 +4,9 @@ const nextConfig = {
     serverComponentsExternalPackages: ['pdf-parse', 'mammoth'],
   },
   async redirects() {
+    if (process.env.NODE_ENV === 'development') {
+      return [];
+    }
     return [
       {
         source: '/',

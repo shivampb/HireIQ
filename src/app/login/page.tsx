@@ -37,8 +37,31 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
+    <div className="auth-container" style={{ height: '100vh', width: '100vw', overflow: 'hidden', padding: 0 }}>
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        disableRemotePlayback
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          pointerEvents: 'none',
+          zIndex: 0
+        }}
+        poster="https://images.unsplash.com/photo-1557683316-973673baf926?w=1600&q=60"
+      >
+        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260424_064411_9e9d7f84-9277-41f4-ab10-59172d89e6be.mp4" type="video/mp4" />
+      </video>
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(255,255,255,0.15)', zIndex: 0 }}></div>
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', overflowY: 'auto' }}>
+        <div className="auth-card" style={{ margin: 'auto', zIndex: 1 }}>
         <div className="auth-header">
           <div className="auth-logo">
             <div className="auth-logo-icon">H</div>
@@ -107,6 +130,7 @@ export default function LoginPage() {
           <Link href="/register" style={{ fontWeight: 600 }}>
             Create one
           </Link>
+        </div>
         </div>
       </div>
     </div>
