@@ -273,127 +273,138 @@ export default function HomePage() {
 
       {/* ═══════════ HERO ═══════════ */}
       <section className="hero">
-        {/* Floating background orbs */}
-        <div className="hero-orb hero-orb-1"></div>
-        <div className="hero-orb hero-orb-2"></div>
-        <div className="hero-orb hero-orb-3"></div>
-        <div className="hero-grid-bg"></div>
-
+        <div className="hero-mesh-gradient"></div>
+        <div className="hero-grid-pattern"></div>
+        
         <div className="container hero-content">
-          <div className="hero-badge-wrapper">
-            <span className="hero-badge-new">
-              <span className="hero-badge-dot"></span>
-              New
-            </span>
-            <span className="hero-badge-text">AI-Powered Technical Assessments</span>
-            <span className="hero-badge-arrow">→</span>
-          </div>
-
-          <h1 className="hero-title hero-title-oneline">
-            Hire smarter with
-          </h1>
-          <div className="hero-typewriter-line">
-            <TypeWriter words={['AI Precision', 'Fraud Detection', 'Smart Questions', 'Deep Insights']} />
-          </div>
-          <p className="hero-title-sub-line">Identify genuine developer talent at scale</p>
-
-          <p className="hero-subtitle">
-            Upload a resume. Get AI-generated questions tailored to the candidate&apos;s skills.
-            Receive a comprehensive evaluation with fraud detection — in minutes, not hours.
-          </p>
-
-          <div className="hero-cta-row">
-            <Link href="/register" className="btn btn-primary btn-hero">
-              Start Assessing for Free
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </Link>
-            <Link href="/how-it-works" className="btn btn-hero-secondary">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5"/><path d="M8 7l5 3-5 3V7z" fill="currentColor"/></svg>
-              See How It Works
-            </Link>
-          </div>
-
-          <div className="hero-trust-row">
-            <div className="hero-trust-avatars">
-              {['#6366f1','#3b82f6','#10b981','#f59e0b','#ef4444'].map((c, i) => (
-                <div key={i} className="hero-trust-avatar" style={{ background: c, zIndex: 5 - i }}>
-                  {String.fromCharCode(65 + i)}
-                </div>
-              ))}
+          <Reveal delay={100}>
+            <div className="hero-badge-wrapper">
+              <span className="hero-badge-new">
+                <span className="hero-badge-dot"></span>
+                New
+              </span>
+              <span className="hero-badge-text">AI Technical Interviewer v2.0</span>
+              <span className="hero-badge-arrow">→</span>
             </div>
-            <div className="hero-trust-text">
-              <div className="hero-trust-stars">★★★★★</div>
-              <span>Trusted by <strong>150+ companies</strong> worldwide</span>
+          </Reveal>
+
+          <Reveal delay={200}>
+            <h1 className="hero-title">
+              The <span className="gradient-text">ultimate AI tool</span> for <br/>
+              modern technical hiring
+            </h1>
+          </Reveal>
+
+          <Reveal delay={300}>
+            <div className="hero-typewriter-line">
+              <TypeWriter words={['Verifies Real Tech Skills', 'Detects Developer Fraud', 'Generates Smart Questions', 'Deep Talent Insights']} />
             </div>
-          </div>
+          </Reveal>
+
+          <Reveal delay={400}>
+            <p className="hero-subtitle">
+              Stop wasting hours on unqualified candidates. HireIQ uses advanced AI to analyze resumes, 
+              verify skills through tailored assessments, and give you a clear hire/no-hire decision — with 100% confidence.
+            </p>
+          </Reveal>
+
+          <Reveal delay={500}>
+            <div className="hero-cta-row">
+              <Link href="/register" className="btn btn-primary btn-hero btn-glow">
+                Start Assessing for Free
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </Link>
+              <Link href="/how-it-works" className="btn btn-hero-secondary">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5"/><path d="M8 7l5 3-5 3V7z" fill="currentColor"/></svg>
+                Watch Demo
+              </Link>
+            </div>
+          </Reveal>
+
+          <Reveal delay={600}>
+            <div className="hero-trust-row">
+              <div className="hero-trust-avatars">
+                {['#4f46e5','#7c3aed','#10b981','#f59e0b','#ef4444'].map((c, i) => (
+                  <div key={i} className="hero-trust-avatar shadow-sm" style={{ background: c, zIndex: 5 - i, border: '2px solid white' }}>
+                    {String.fromCharCode(65 + i)}
+                  </div>
+                ))}
+              </div>
+              <div className="hero-trust-text">
+                <div className="hero-trust-stars" style={{ color: '#fbbf24' }}>★★★★★</div>
+                <span>Rated <strong>4.9/5</strong> by 500+ talent leaders</span>
+              </div>
+            </div>
+          </Reveal>
 
           {/* Dashboard Preview Mockup */}
-          <div className="hero-mockup-wrapper">
-              <div className="hero-mockup-glow"></div>
-              <div className="hero-mockup">
-                {/* Mock Dashboard Header */}
-                <div className="mockup-topbar">
-                  <div className="mockup-dots">
-                    <span style={{background:'#ff5f57'}}></span>
-                    <span style={{background:'#ffbd2e'}}></span>
-                    <span style={{background:'#28c840'}}></span>
+          <Reveal delay={700} className="hero-mockup-reveal">
+            <div className="hero-mockup-wrapper">
+                <div className="hero-mockup-glow"></div>
+                <div className="hero-mockup">
+                  {/* Mock Dashboard Header */}
+                  <div className="mockup-topbar">
+                    <div className="mockup-dots">
+                      <span style={{background:'#ff5f57'}}></span>
+                      <span style={{background:'#ffbd2e'}}></span>
+                      <span style={{background:'#28c840'}}></span>
+                    </div>
+                    <div className="mockup-url">hireiq.app/dashboard</div>
+                    <div></div>
                   </div>
-                  <div className="mockup-url">hireiq.app/dashboard</div>
-                  <div></div>
-                </div>
-                <div className="mockup-body">
-                  {/* Sidebar */}
-                  <div className="mockup-sidebar">
-                    <div className="mockup-sidebar-brand">
-                      <div className="mockup-sidebar-icon">H</div>
-                      <span>HireIQ</span>
-                    </div>
-                    <div className="mockup-sidebar-item active">📊 Overview</div>
-                    <div className="mockup-sidebar-item">📝 Assessments</div>
-                    <div className="mockup-sidebar-item">👥 Candidates</div>
-                    <div className="mockup-sidebar-item">⚙️ Settings</div>
-                  </div>
-                  {/* Content */}
-                  <div className="mockup-content">
-                    <div className="mockup-content-header">
-                      <span className="mockup-greeting">Good morning, Alex 👋</span>
-                    </div>
-                    <div className="mockup-stats-row">
-                      <div className="mockup-stat-card">
-                        <div className="mockup-stat-num" style={{color:'var(--primary-600)'}}>24</div>
-                        <div className="mockup-stat-label">Active Assessments</div>
+                  <div className="mockup-body">
+                    {/* Sidebar */}
+                    <div className="mockup-sidebar">
+                      <div className="mockup-sidebar-brand">
+                        <div className="mockup-sidebar-icon">H</div>
+                        <span>HireIQ</span>
                       </div>
-                      <div className="mockup-stat-card">
-                        <div className="mockup-stat-num" style={{color:'var(--success-600)'}}>189</div>
-                        <div className="mockup-stat-label">Candidates Evaluated</div>
-                      </div>
-                      <div className="mockup-stat-card">
-                        <div className="mockup-stat-num" style={{color:'var(--violet-600)'}}>87%</div>
-                        <div className="mockup-stat-label">Avg. Score</div>
-                      </div>
+                      <div className="mockup-sidebar-item active">📊 Overview</div>
+                      <div className="mockup-sidebar-item">📝 Assessments</div>
+                      <div className="mockup-sidebar-item">👥 Candidates</div>
+                      <div className="mockup-sidebar-item">⚙️ Settings</div>
                     </div>
-                    {/* Mini candidate rows */}
-                    <div className="mockup-table-header">
-                      <span>Candidate</span><span>Score</span><span>Status</span>
-                    </div>
-                    {[
-                      { name: 'Priya Sharma', score: 92, status: 'Strong Hire', color: '#059669' },
-                      { name: 'James Wilson', score: 78, status: 'Hire', color: '#2563eb' },
-                      { name: 'Anonymous_dev', score: 34, status: 'Suspicious', color: '#dc2626' },
-                    ].map((c, i) => (
-                      <div key={i} className="mockup-table-row" style={{ animationDelay: `${1 + i * 0.3}s` }}>
-                        <span className="mockup-candidate-name">{c.name}</span>
-                        <span className="mockup-score-bar">
-                          <span className="mockup-score-fill" style={{ width: `${c.score}%`, background: c.color }}></span>
-                          <span className="mockup-score-text">{c.score}%</span>
-                        </span>
-                        <span className="mockup-status" style={{ color: c.color, background: `${c.color}15` }}>{c.status}</span>
+                    {/* Content */}
+                    <div className="mockup-content">
+                      <div className="mockup-content-header">
+                        <span className="mockup-greeting">Good morning, Alex 👋</span>
                       </div>
-                    ))}
+                      <div className="mockup-stats-row">
+                        <div className="mockup-stat-card">
+                          <div className="mockup-stat-num" style={{color:'var(--primary-600)'}}>24</div>
+                          <div className="mockup-stat-label">Assessments</div>
+                        </div>
+                        <div className="mockup-stat-card">
+                          <div className="mockup-stat-num" style={{color:'var(--success-600)'}}>189</div>
+                          <div className="mockup-stat-label">Candidates</div>
+                        </div>
+                        <div className="mockup-stat-card">
+                          <div className="mockup-stat-num" style={{color:'var(--violet-600)'}}>87%</div>
+                          <div className="mockup-stat-label">Avg. Score</div>
+                        </div>
+                      </div>
+                      {/* Mini candidate rows */}
+                      <div className="mockup-table-header">
+                        <span>Candidate</span><span>Score</span><span>Status</span>
+                      </div>
+                      {[
+                        { name: 'Priya Sharma', score: 92, status: 'Hire', color: '#10b981' },
+                        { name: 'James Wilson', score: 78, status: 'Review', color: '#3b82f6' },
+                        { name: 'AI_Test_User', score: 34, status: 'Fraud', color: '#ef4444' },
+                      ].map((c, i) => (
+                        <div key={i} className="mockup-table-row">
+                          <span className="mockup-candidate-name">{c.name}</span>
+                          <span className="mockup-score-bar">
+                            <span className="mockup-score-fill" style={{ width: `${c.score}%`, background: c.color }}></span>
+                          </span>
+                          <span className="mockup-status" style={{ color: c.color, background: `${c.color}15` }}>{c.status}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+          </Reveal>
         </div>
       </section>
 

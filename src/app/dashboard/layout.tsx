@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { href: '/dashboard', icon: '📊', label: 'Overview' },
   { href: '/dashboard/assessments', icon: '📝', label: 'Assessments' },
   { href: '/dashboard/candidates', icon: '👥', label: 'Candidates' },
+  { href: '/dashboard/profile', icon: '⚙️', label: 'Profile' },
 ];
 
 export default function DashboardLayout({
