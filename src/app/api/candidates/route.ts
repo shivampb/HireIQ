@@ -5,6 +5,8 @@ import dbConnect from '@/lib/mongodb';
 import Candidate from '@/models/Candidate';
 import Report from '@/models/Report';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
